@@ -15,6 +15,11 @@
 			    {{trans('tasks.template.all_tasks')}}
 			</div>
 			<div class="panel-body">
+			    <form action="{{route('tasks.create')}}" method="post">
+				{{ csrf_field() }}
+				{{ method_field('GET') }}
+				<button><i class="fa fa-plus"></i>Создать задачу</button>
+			    </form>
 			    <table class="table table-striped task-table">
 				<!-- Заголовок таблицы -->
 				<thead>

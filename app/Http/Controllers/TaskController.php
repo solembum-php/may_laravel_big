@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Admin\Task;
 
 class TaskController extends Controller {
 
@@ -18,10 +19,7 @@ class TaskController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-	$user = Auth::user();
-	$tasks = $user->tasks()
-		->orderBy('created_at')
-		->get();
+	$tasks = Task::all();
 	return view('admin.tasks.index', ['tasks' => $tasks]);
     }
 
@@ -31,7 +29,7 @@ class TaskController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create() {
-	//
+	return view('admin.tasks.create');
     }
 
     /**
@@ -41,7 +39,15 @@ class TaskController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
-	//
+	$this->validate($request, [
+	    'name' => 'required|max:255',
+	]);
+
+	$request->user()->tasks()->create([
+	    'name' => $request->name,
+	]);
+
+	return redirect(route('tasks.index'));
     }
 
     /**
@@ -81,8 +87,10 @@ class TaskController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id) {
-	//
+    public function destroy(Task $tasks) {
+	$this->authorize('destroy', $tasks);
+	$tasks->delete();
+	return redirect(route('tasks.index'));
     }
 
 }
